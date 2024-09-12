@@ -14,14 +14,27 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(email: string, password: string): Promise<{ message: string }> {
+  async signUp(
+    email: string,
+    password: string,
+  ): Promise<{
+    message: string;
+    token?: string;
+  }> {
     const existingUser = await this.usersService.findOne(email);
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
 
-    await this.usersService.create(email, password);
-    return { message: 'User registered successfully' };
+    const newUser = await this.usersService.create(email, password);
+
+    const payload = { email: newUser.email };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      message: 'User registered successfully',
+      token,
+    };
   }
 
   async logIn(email: string, password: string): Promise<{ token: string }> {
@@ -31,7 +44,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const token = this.jwtService.sign({ email });
+    const payload = { email: user.email };
+    const token = this.jwtService.sign(payload);
     return { token };
   }
 }

@@ -11,7 +11,7 @@ export class UploadService {
     private fileUploadModel: Model<FileUploadDocument>,
   ) {}
 
-  async uploadFile(file: Express.Multer.File) {
+  async uploadFile(file: Express.Multer.File, email: string) {
     const allowedMimeTypes = ['application/pdf', 'image/jpeg'];
     if (!allowedMimeTypes.includes(file.mimetype)) {
       throw new BadRequestException('Only PDF and JPEG files are allowed');
@@ -23,6 +23,7 @@ export class UploadService {
 
     const newFile = new this.fileUploadModel({
       filename: generatedFileName,
+      uploadedBy: email,
     });
 
     await newFile.save();

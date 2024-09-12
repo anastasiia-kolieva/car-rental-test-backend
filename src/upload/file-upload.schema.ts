@@ -8,6 +8,9 @@ export class FileUpload {
   @Prop({ required: true })
   filename: string;
 
+  @Prop({ required: true })
+  uploadedBy: string;
+
   @Prop({ default: Date.now })
   uploadedAt: Date;
 }
